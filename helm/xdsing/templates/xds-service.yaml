@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: xds
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{ .Chart.Name }}-xds
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  selector:
+    app: {{ .Chart.Name }}-xds
+  ports:
+  - name: grpc-xds
+    protocol: TCP
+    port: {{ .Values.xds.port }}
+    targetPort: xds
+  - name: grpc-xds-shard
+    protocol: TCP
+    port: {{ .Values.xds.shardPort }}
+    targetPort: shard

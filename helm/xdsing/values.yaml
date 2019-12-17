@@ -1,0 +1,21 @@
+xds:
+  address: xds
+  port: 9000
+  shardPort: 9005
+  domain: "bladedancer.dynu.net"
+  dnsRefreshRate: 300000 # 300s
+  respectDNSTTL: false # CoreDNS is too low
+  repo: bladedancer
+  shards: 2
+
+  # TODO: Mount in
+  service:
+    user: admin
+    secret: servicesecret
+
+  sync:
+    tls: false
+    host: config-service
+    port: 8080
+    timeout: 60
+    interval: 10

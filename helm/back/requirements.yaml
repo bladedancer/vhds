@@ -1,0 +1,4 @@
+dependencies:
+- name: envoyss
+  version: 1.8.2
+  repository: file://../envoyss

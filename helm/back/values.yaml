@@ -1,0 +1,106 @@
+envoyss:
+  fullnameOverride: back
+  nameOverride: back
+  image:
+    tag: v1.12.1
+
+  podDisruptionBudget: |
+    maxUnavailable: 3
+
+  xdsService:
+    address: xds
+    port: 9000
+  authzService:
+    address: authz
+    port: 20000
+  args:
+    - -l
+    - info
+    - -c
+    - /env-config/envoy.yaml
+  ports:
+    n0:
+      containerPort: 443 # probably don't need tls here.
+      protocol: TCP
+
+  # Need to inject the ordinal
+  initContainersTemplate: |-
+    - name: init-back
+      image: bhgedigital/envsubst
+      command: [ "sh", "-c", "envsubst < /config/envoy.yaml > /env-config/envoy.yaml"]
+      volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: env-config
+          mountPath: /env-config
+  volumes:
+  - name: env-config
+    emptyDir: {}
+  volumeMounts:
+  - name: env-config
+    mountPath: /env-config
+
+  service:
+    name: back
+    type: ClusterIP
+    ports:
+      n0:
+        port: 443
+        protocol: TCP
+  templates:
+    envoy.yaml: |-
+      admin:
+        access_log_path: /dev/stdout
+        address:
+          socket_address:
+            address: 0.0.0.0
+            port_value: 9901
+      node:
+        id: ${HOSTNAME}
+        cluster: service_xds
+      dynamic_resources:
+        lds_config:
+          api_config_source:
+            api_type: GRPC
+            grpc_services:
+              envoy_grpc:
+                cluster_name: service_xds
+        cds_config:
+          api_config_source:
+            api_type: GRPC
+            grpc_services:
+              envoy_grpc:
+                cluster_name: service_xds
+      static_resources:
+        clusters:
+        - name: service_xds
+          connect_timeout: 0.25s
+          type: LOGICAL_DNS
+          dns_lookup_family: V4_ONLY
+          dns_refresh_rate: "30s"
+          lb_policy: ROUND_ROBIN
+          http2_protocol_options: {}
+          load_assignment:
+            cluster_name: service_xds
+            endpoints:
+            - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: {{ .Values.xdsService.address }}
+                      port_value: {{ .Values.xdsService.port }}
+        - name: service_apibroker
+          connect_timeout: 0.25s
+          type: LOGICAL_DNS
+          dns_lookup_family: V4_ONLY
+          dns_refresh_rate: "30s"
+          lb_policy: ROUND_ROBIN
+          load_assignment:
+            cluster_name: service_apibroker
+            endpoints:
+            - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: "api-broker-svc"
+                      port_value: 8080

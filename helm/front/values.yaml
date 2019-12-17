@@ -1,0 +1,92 @@
+envoy:
+  fullnameOverride: front
+  nameOverride: front
+  image:
+    tag: v1.12.1
+
+  xdsService:
+    address: xds
+    port: 9000
+    shardPort: 9005
+  args:
+    - -l
+    - info
+    - -c
+    - /config/envoy.yaml
+  secretMounts:
+    certs:
+      mountPath: /certs
+      secretName: front-tls-front
+      defaultMode: 511 # TODO
+  ports:
+    n0:
+      containerPort: 443
+      protocol: TCP
+
+  # Need to inject the ordinal
+  initContainersTemplate: |-
+    - name: wait-for-back
+      image: byrnedo/alpine-curl
+      command:
+      - sh
+      - "-c"
+      - "until $(curl --output /dev/null --silent --head --fail http://back-0.back:9901/ready); do echo \"waiting for back-0\"; sleep 2;done;"
+
+  service:
+    name: front
+    type: LoadBalancer
+    ports:
+      n0:
+        port: 443
+        protocol: TCP
+    # annotations:
+    #   external-dns.alpha.kubernetes.io/hostname: '*.envoy.six.moloko.apic-k8s.axwaytest.net.'
+    #   service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: Project=apicentral
+    #   service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: '*'
+  templates:
+    envoy.yaml: |-
+      admin:
+        access_log_path: /dev/stdout
+        address:
+          socket_address:
+            address: 0.0.0.0
+            port_value: 9901
+      node:
+        id: front
+        cluster: service_xds
+      dynamic_resources:
+        lds_config:
+          api_config_source:
+            api_type: GRPC
+            grpc_services:
+              envoy_grpc:
+                cluster_name: service_xds
+        cds_config:
+          api_config_source:
+            api_type: GRPC
+            grpc_services:
+              envoy_grpc:
+                cluster_name: service_xds
+      static_resources:
+        clusters:
+        - name: service_xds
+          connect_timeout: 0.25s
+          type: LOGICAL_DNS
+          dns_lookup_family: V4_ONLY
+          dns_refresh_rate: "30s"
+          lb_policy: ROUND_ROBIN
+          http2_protocol_options: {}
+          hosts:
+          - socket_address:
+              address: {{ .Values.xdsService.address }}
+              port_value: {{ .Values.xdsService.port }}
+        - name: service_xds_shard
+          connect_timeout: 0.25s
+          type: LOGICAL_DNS
+          dns_lookup_family: V4_ONLY
+          dns_refresh_rate: "30s"
+          lb_policy: ROUND_ROBIN
+          hosts:
+          - socket_address:
+              address: {{ .Values.xdsService.address }}
+              port_value: {{ .Values.xdsService.shardPort }}

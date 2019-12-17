@@ -1,0 +1,19 @@
+xdsing:
+  xds:
+    shards: 3                     # must match replicaCount
+    domain: gm-envoy.moloko.apic-k8s.axwaytest.net  # change to your domain
+    useProxyProto: true # MUST be true if annotated with service.beta.kubernetes.io/aws-load-balancer-proxy-protocol
+
+back:
+  envoyss:
+    replicaCount: 3 # must match shards
+    strategy: |
+      type: RollingUpdate
+
+front:
+  envoy:
+    service:
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: '*.gm-envoy.moloko.apic-k8s.axwaytest.net.'
+        service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: Project=apicentral
+        service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: '*'

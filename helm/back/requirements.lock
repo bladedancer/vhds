@@ -1,0 +1,6 @@
+dependencies:
+- name: envoyss
+  repository: file://../envoyss
+  version: 1.8.2
+digest: sha256:407d7e0f23c9df5ced77fe46b2a29ca902b721045ba187b3a65b590476005282
+generated: 2019-11-01T14:11:29.045966355Z

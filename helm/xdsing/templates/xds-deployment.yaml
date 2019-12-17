@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xds
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{ .Chart.Name }}-xds
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-xds
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-xds
+    spec:
+      containers:
+      - name: xds
+        image: {{ .Values.xds.repo }}/xdsing:latest
+        pullPolicy: IfNotPresent
+        env:
+          - name: XDS_PORT
+            value: "12000"
+          - name: XDS_CERTPATH
+            value: {{ .Values.xds.certPath }}
+          - name: XDS_DOMAIN
+            value: {{ .Values.xds.domain }}
+          - name: XDS_DNSREFRESHRATE
+            value: "{{ .Values.xds.dnsRefreshRate }}"
+          - name: XDS_RESPECTDNSTTL
+            value: "{{ .Values.xds.respectDNSTTL }}"
+          - name: XDS_SHARDS
+            value: "{{ .Values.xds.shards }}"
+          - name: XDS_USEPROXYPROTO
+            value: "{{ .Values.xds.useProxyProto }}"
+          - name: XDS_SERVICE_USER
+            value: "{{ .Values.xds.service.user }}"
+          - name: XDS_SERVICE_SECRET
+            value: "{{ .Values.xds.service.secret }}"
+          - name: XDS_READINESS_PORT
+            value: "8082"
+          - name: XDS_SYNC_TLS
+            value: "{{ .Values.xds.sync.tls }}"
+          - name: XDS_SYNC_HOST
+            value: "{{ .Values.xds.sync.host }}"
+          - name: XDS_SYNC_PORT
+            value: "{{ .Values.xds.sync.port }}"
+          - name: XDS_SYNC_TIMEOUT
+            value: "{{ .Values.xds.sync.timeout }}"
+          - name: XDS_SYNC_INTERVAL
+            value: "{{ .Values.xds.sync.interval }}"
+        ports:
+        - containerPort: 12000
+          name: xds
+        - containerPort: 12001
+          name: shard
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8082
+          initialDelaySeconds: 5
+          periodSeconds: 30
+          failureThreshold: 3

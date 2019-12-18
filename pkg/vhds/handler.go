@@ -47,10 +47,10 @@ func (*AxwayVirtualHostDiscoveryServiceServer) DeltaVirtualHosts(srv api.Virtual
 			if req.GetResponseNonce() == "" {
 				// Initial response
 				err = srv.Send(&api.DeltaDiscoveryResponse{
-					SystemVersionInfo: "",
-					Resources:         nil,
+					SystemVersionInfo: "test",
+					Resources:         []*api.Resource{},
 					TypeUrl:           "type.googleapis.com/envoy.api.v2.route.VirtualHost",
-					RemovedResources:  nil,
+					RemovedResources:  []string{},
 					Nonce:             fmt.Sprintf("%d", time.Now().UnixNano()), //deltaReq.ResponseNonce,
 				})
 			} else {

@@ -6,7 +6,11 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/bladedancer/vhds/pkg/central"
+	"github.com/bladedancer/vhds/pkg/xdsconfig"
 	api "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	"github.com/golang/protobuf/ptypes"
+	any "github.com/golang/protobuf/ptypes/any"
 )
 
 // AxwayVirtualHostDiscoveryServiceServer implements the Stream Access Logs endpoint.
@@ -48,10 +52,17 @@ func (*AxwayVirtualHostDiscoveryServiceServer) DeltaVirtualHosts(srv api.Virtual
 				// Initial response
 				err = srv.Send(&api.DeltaDiscoveryResponse{
 					SystemVersionInfo: "test",
-					Resources:         []*api.Resource{},
-					TypeUrl:           "type.googleapis.com/envoy.api.v2.route.VirtualHost",
-					RemovedResources:  []string{},
-					Nonce:             fmt.Sprintf("%d", time.Now().UnixNano()), //deltaReq.ResponseNonce,
+					Resources: []*api.Resource{
+						&api.Resource{
+							Name:     "foo",
+							Version:  "1",
+							Aliases:  []string{"Foo"},
+							Resource: getFakeVHost(1),
+						},
+					},
+					TypeUrl:          "type.googleapis.com/envoy.api.v2.route.VirtualHost",
+					RemovedResources: []string{},
+					Nonce:            fmt.Sprintf("%d", time.Now().UnixNano()), //deltaReq.ResponseNonce,
 				})
 			} else {
 				// ACK/NACK?
@@ -67,6 +78,30 @@ func (*AxwayVirtualHostDiscoveryServiceServer) DeltaVirtualHosts(srv api.Virtual
 
 	atomic.StoreInt32(&reqStop, 1)
 	return err
+}
+
+func getFakeVHost(i int) *any.Any {
+	rtg := xdsconfig.MakeRuntimeGroup(fakeGetListener(i))
+	vh, _ := ptypes.MarshalAny(rtg.VirtualHosts[0])
+	return vh
+}
+
+func fakeGetListener(i int) *central.Listener {
+	listener := &central.Listener{
+		ID:             fmt.Sprintf("id-%d", i),
+		Activated:      true,
+		Name:           fmt.Sprintf("id-%d", i),
+		Protocol:       "http",
+		BindAddress:    "0.0.0.0",
+		Port:           "80",
+		VirtualHosts:   []string{"test", "prod"},
+		RuntimeGroupID: fmt.Sprintf("%d", i),
+		Metadata:       nil,
+		InstanceName:   fmt.Sprintf("inst-%d", i%2),
+		TenantID:       fmt.Sprintf("ten-%d", i%2),
+	}
+
+	return listener
 }
 
 // func watchCentral(snapshotCache cache.SnapshotCache) {

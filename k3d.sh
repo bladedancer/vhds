@@ -55,5 +55,4 @@ echo ======================
 echo ===    Install     ===
 echo ======================
 
-helm dep update ./helm/ingress
 helm install --name=ingress ./helm/ingress

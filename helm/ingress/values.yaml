@@ -9,6 +9,19 @@ back:
     replicaCount: 3 # must match shards
     strategy: |
       type: RollingUpdate
+    # Try bleeding edge for vhds
+    image:
+      tag: latest
+      repository: envoyproxy/envoy-dev
+    # Local debugging
+    #xdsService:
+    #  address: 192.168.1.42
+    #  port: 10000
+    #args:
+    #  - -l
+    #  - debug
+    #  - -c
+    #  - /env-config/envoy.yaml
 
 front:
   envoy:

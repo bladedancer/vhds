@@ -48,9 +48,10 @@ func readinessHandler(readinessChan chan Readiness) func(http.ResponseWriter, *h
 			return
 		}
 		status := http.StatusOK
-		if !response.Ready {
-			status = http.StatusServiceUnavailable
-		}
+		// TODO: REINSTATE FOR NOW ALWAYS READY
+		// if !response.Ready {
+		// 	status = http.StatusServiceUnavailable
+		// }
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(status)
 		json.NewEncoder(w).Encode(response)

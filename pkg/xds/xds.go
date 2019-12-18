@@ -8,7 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/bladedancer/xdsing/pkg/accesslog"
+	"github.com/bladedancer/vhds/pkg/accesslog"
+	"github.com/bladedancer/vhds/pkg/vhds"
 	api "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	als "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
@@ -31,19 +32,19 @@ func Run() error {
 		log.Fatal(err)
 	}
 
-	log.Info("Starting Shard Routing Service...")
-	MakeShardRouter().Run()
-
 	discovery.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
 	api.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
 	api.RegisterClusterDiscoveryServiceServer(grpcServer, server)
 	api.RegisterRouteDiscoveryServiceServer(grpcServer, server)
 	api.RegisterListenerDiscoveryServiceServer(grpcServer, server)
 
+	// Virtual Host Discovery Service
+	api.RegisterVirtualHostDiscoveryServiceServer(grpcServer, &vhds.AxwayVirtualHostDiscoveryServiceServer{})
+
 	// Configure the Access Log server.
 	als.RegisterAccessLogServiceServer(grpcServer, &accesslog.Handler{})
 
-	watchCentral(snapshotCache)
+	watch(snapshotCache)
 
 	go func() {
 		if err = grpcServer.Serve(lis); err != nil {

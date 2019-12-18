@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: xds
-        image: {{ .Values.xds.repo }}/xdsing:latest
+        image: {{ .Values.xds.repo }}/vhds:latest
         pullPolicy: IfNotPresent
         env:
           - name: XDS_PORT

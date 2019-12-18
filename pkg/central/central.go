@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/bladedancer/xdsing/pkg/base"
+	"github.com/bladedancer/vhds/pkg/base"
 )
 
 // Watch central for changes
@@ -22,7 +22,6 @@ func Watch(ready chan base.Readiness) chan []*Listener {
 		for {
 			select {
 			case <-tick.C:
-				log.Infof("Sync")
 				sync(ready, listenerUpdateChan)
 			}
 		}
@@ -42,6 +41,29 @@ func sync(readyChan chan base.Readiness, listenerChan chan []*Listener) {
 	listenerChan <- listeners
 	readyChan <- &_SyncReadiness{Ready: true}
 }
+
+// func fakeGetListeners() ([]*Listener, error) {
+// 	// Faking it.
+// 	listeners := []*Listener{}
+
+// 	for i := 0; i < 10; i++ {
+// 		listeners = append(listeners, &Listener{
+// 			ID:             fmt.Sprintf("id-%d", i),
+// 			Activated:      true,
+// 			Name:           fmt.Sprintf("id-%d", i),
+// 			Protocol:       "http",
+// 			BindAddress:    "0.0.0.0",
+// 			Port:           "80",
+// 			VirtualHosts:   []string{"test", "prod"},
+// 			RuntimeGroupID: fmt.Sprintf("%d", i),
+// 			Metadata:       nil,
+// 			InstanceName:   fmt.Sprintf("inst-%d", i%2),
+// 			TenantID:       fmt.Sprintf("ten-%d", i%2),
+// 		})
+// 	}
+
+// 	return listeners, nil
+// }
 
 func getListeners() ([]*Listener, error) {
 	req, err := http.NewRequest("GET", config.syncURL, nil)

@@ -1,4 +1,4 @@
-package xds
+package vhds
 
 import (
 	"github.com/bladedancer/vhds/pkg/base"
@@ -8,8 +8,8 @@ import (
 var log logrus.FieldLogger
 var config *base.Config
 
-// Init initializes the XDS package.
+// Init initializes the config and log
 func Init(logger *logrus.Logger) {
-	log = logger.WithField("package", "xds")
+	log = logger.WithField("package", "vhds")
 	config = base.GetConfig()
 }

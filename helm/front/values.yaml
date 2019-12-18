@@ -2,7 +2,7 @@ envoy:
   fullnameOverride: front
   nameOverride: front
   image:
-    tag: v1.12.1
+    tag: v1.12.2
 
   xdsService:
     address: xds

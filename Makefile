@@ -1,7 +1,7 @@
-PROJECT_NAME := xdsing
+PROJECT_NAME := vhds
 PKG_LIST := $(shell go list ./... | grep -v /vendor/)
 REGISTRY ?= bladedancer
-BIN ?= xdsing
+BIN ?= vhds
 
 PKG := bladedancer/$(PROJECT_NAME)
 
@@ -9,10 +9,10 @@ PKG := bladedancer/$(PROJECT_NAME)
 
 _all: clean lint helm docker-build push helm ## Build everything
 
-all: xdsing
+all: vhds
 
-xdsing:
-	@$(MAKE) _all BIN=xdsing
+vhds:
+	@$(MAKE) _all BIN=vhds
 
 lint: ## Lint the files
 	@golint	-set_exit_status	${PKG_LIST}
@@ -27,9 +27,10 @@ push: ## Push docker image
 	docker push $(REGISTRY)/$(BIN):latest
 
 helm: ## Update helm charts
+	helm dep update ./helm/envoyss && \
 	helm dep update ./helm/back && \
 	helm dep update ./helm/front && \
-	helm dep update ./helm/xdsing && \
+	helm dep update ./helm/xds && \
 	helm dep update ./helm/ingress
 
 clean: ## Clean out dir

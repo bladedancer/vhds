@@ -1,7 +1,7 @@
 package xdsconfig
 
 import (
-	"github.com/bladedancer/xdsing/pkg/base"
+	"github.com/bladedancer/vhds/pkg/base"
 	"github.com/sirupsen/logrus"
 )
 

@@ -2,6 +2,7 @@ package xdsconfig
 
 import (
 	api "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 )
@@ -53,6 +54,24 @@ func (s *BackendShard) getRouteResources() []cache.Resource {
 	config := &api.RouteConfiguration{
 		Name:         "local_route",
 		VirtualHosts: vhosts,
+		Vhds: &api.Vhds{
+			ConfigSource: &core.ConfigSource{
+				ConfigSourceSpecifier: &core.ConfigSource_ApiConfigSource{
+					ApiConfigSource: &core.ApiConfigSource{
+						ApiType: core.ApiConfigSource_DELTA_GRPC,
+						GrpcServices: []*core.GrpcService{
+							&core.GrpcService{
+								TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
+									EnvoyGrpc: &core.GrpcService_EnvoyGrpc{
+										ClusterName: "service_xds",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	resources := []cache.Resource{config}
 	return resources

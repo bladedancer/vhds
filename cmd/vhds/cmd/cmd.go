@@ -3,11 +3,12 @@ package cmd
 import (
 	"strings"
 
-	"github.com/bladedancer/xdsing/pkg/accesslog"
-	"github.com/bladedancer/xdsing/pkg/base"
-	"github.com/bladedancer/xdsing/pkg/central"
-	"github.com/bladedancer/xdsing/pkg/xds"
-	"github.com/bladedancer/xdsing/pkg/xdsconfig"
+	"github.com/bladedancer/vhds/pkg/accesslog"
+	"github.com/bladedancer/vhds/pkg/base"
+	"github.com/bladedancer/vhds/pkg/central"
+	"github.com/bladedancer/vhds/pkg/vhds"
+	"github.com/bladedancer/vhds/pkg/xds"
+	"github.com/bladedancer/vhds/pkg/xdsconfig"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -15,7 +16,7 @@ import (
 
 // RootCmd configures the command params for the main line.
 var RootCmd = &cobra.Command{
-	Use:     "xdsing",
+	Use:     "vhds",
 	Short:   "The XDS configures Envoy as an Ingress for Central.",
 	Version: "0.0.1",
 	RunE:    run,
@@ -89,6 +90,7 @@ func run(cmd *cobra.Command, args []string) error {
 	base.Init(logger, baseConfig())
 	accesslog.Init(logger)
 	central.Init(logger, centralConfig())
+	vhds.Init(logger)
 	xds.Init(logger)
 	xdsconfig.Init(logger)
 

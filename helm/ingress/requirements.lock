@@ -1,6 +1,6 @@
 dependencies:
-- name: xdsing
-  repository: file://./../xdsing
+- name: xds
+  repository: file://./../xds
   version: 1.0.0
 - name: front
   repository: file://./../front
@@ -8,5 +8,5 @@ dependencies:
 - name: back
   repository: file://./../back
   version: 1.0.0
-digest: sha256:ffeeed45ed04787ebea1220a3afdfb1d83599fb5d3f55c6a7d1b6e4dec2ebf48
-generated: 2019-11-28T20:09:36.75366373Z
+digest: sha256:96c609e30b675c0ca0cef35b16b940626d62b8b5abd205138a77f53c9133bdc2
+generated: 2019-12-17T11:04:41.112452132Z

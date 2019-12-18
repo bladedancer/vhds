@@ -1,4 +1,4 @@
-xdsing:
+xds:
   xds:
     shards: 3                     # must match replicaCount
     domain: gm-envoy.moloko.apic-k8s.axwaytest.net  # change to your domain

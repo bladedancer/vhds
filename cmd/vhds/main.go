@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/bladedancer/xdsing/cmd/xdsing/cmd"
+	"github.com/bladedancer/vhds/cmd/vhds/cmd"
 )
 
 func main() {

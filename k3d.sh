@@ -43,10 +43,7 @@ echo ======================
 echo === Install Images ===
 echo ======================
 
-docker pull $REPO/envoyxds:latest
-docker pull $REPO/authz:latest
-k3d i --name=xds  $REPO/envoyxds:latest
-k3d i --name=xds  $REPO/authz:latest
+k3d i --name=xds  $REPO/ingress:latest
 
 echo ======================
 echo ===    Wait     ===
@@ -58,5 +55,5 @@ echo ======================
 echo ===    Install     ===
 echo ======================
 
-helm dep update ./helm/saas
-helm install --name=saas ./helm/saas
+helm dep update ./helm/ingress
+helm install --name=ingress ./helm/ingress

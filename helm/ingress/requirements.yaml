@@ -1,7 +1,7 @@
 dependencies:
-- name: xdsing
+- name: xds
   version: 1.0.0
-  repository: file://./../xdsing
+  repository: file://./../xds
 - name: front
   version: 1.0.0
   repository: file://./../front

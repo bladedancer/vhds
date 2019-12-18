@@ -3,7 +3,7 @@ package xdsconfig
 import (
 	"fmt"
 
-	"github.com/bladedancer/xdsing/pkg/central"
+	"github.com/bladedancer/vhds/pkg/central"
 	uuid "github.com/satori/go.uuid"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"

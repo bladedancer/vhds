@@ -27,6 +27,7 @@ push: ## Push docker image
 	docker push $(REGISTRY)/$(BIN):latest
 
 helm: ## Update helm charts
+	find ./helm -name *.tgz -exec rm {} \; && \
 	helm dep update ./helm/envoyss && \
 	helm dep update ./helm/back && \
 	helm dep update ./helm/front && \

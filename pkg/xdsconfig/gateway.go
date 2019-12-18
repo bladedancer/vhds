@@ -85,7 +85,7 @@ func MakeBackendGateway() *Gateway {
 func makeListenerConfiguration(useProxyProto bool, tlsContext *auth.DownstreamTlsContext, httpFilters ...*http_conn.HttpFilter) *api.Listener {
 	var filterChains []*listener.FilterChain
 
-	fileAccessLogStruct, _ := conversion.MessageToStruct(&access_config.FileAccessLog{
+	fileAccessLogAny, _ := ptypes.MarshalAny(&access_config.FileAccessLog{
 		Path: "/dev/stdout",
 	})
 
@@ -113,12 +113,14 @@ func makeListenerConfiguration(useProxyProto bool, tlsContext *auth.DownstreamTl
 				},
 			},
 		},
-		IdleTimeout: ptypes.DurationProto(2 * time.Second),
+		CommonHttpProtocolOptions: &core.HttpProtocolOptions{
+			IdleTimeout: ptypes.DurationProto(2 * time.Second),
+		},
 		AccessLog: []*access_filter.AccessLog{
 			&access_filter.AccessLog{
 				Name: "envoy.file_access_log",
-				ConfigType: &access_filter.AccessLog_Config{
-					Config: fileAccessLogStruct,
+				ConfigType: &access_filter.AccessLog_TypedConfig{
+					TypedConfig: fileAccessLogAny,
 				},
 			},
 			&access_filter.AccessLog{
@@ -129,12 +131,12 @@ func makeListenerConfiguration(useProxyProto bool, tlsContext *auth.DownstreamTl
 		StatPrefix:  "ingress_http",
 		HttpFilters: httpFilters,
 	}
-	filterConfigStruct, _ := conversion.MessageToStruct(filterConfig)
 
+	filterConfigAny, _ := ptypes.MarshalAny(filterConfig)
 	filter := &listener.Filter{
 		Name: "envoy.http_connection_manager",
-		ConfigType: &listener.Filter_Config{
-			Config: filterConfigStruct,
+		ConfigType: &listener.Filter_TypedConfig{
+			TypedConfig: filterConfigAny,
 		},
 	}
 
@@ -199,7 +201,7 @@ func getLuaFilter() *http_conn.HttpFilter_Config {
 	}
 }
 
-func getAccessLogFilter() *access_filter.AccessLog_Config {
+func getAccessLogFilter() *access_filter.AccessLog_TypedConfig {
 	log.Info("Building Access Log Filter")
 	cfg := &access_config.HttpGrpcAccessLogConfig{
 		CommonConfig: &access_config.CommonGrpcAccessLogConfig{
@@ -213,8 +215,8 @@ func getAccessLogFilter() *access_filter.AccessLog_Config {
 			LogName: "Front",
 		},
 	}
-	config, _ := conversion.MessageToStruct(cfg)
-	return &access_filter.AccessLog_Config{
-		Config: config,
+	config, _ := ptypes.MarshalAny(cfg)
+	return &access_filter.AccessLog_TypedConfig{
+		TypedConfig: config,
 	}
 }

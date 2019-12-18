@@ -6,11 +6,12 @@ import als "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
 type Handler struct{}
 
 // StreamAccessLogs the sink for access logs.
-func (svc *Handler) StreamAccessLogs(stream als.AccessLogService_StreamAccessLogsServer) error {
+func (svc *Handler) StreamAccessLogs(stream als.AccessLogService_StreamAccessLogsServer) (err error) {
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
-			panic(err)
+			log.Error(err.Error())
+			break
 		}
 		switch entries := msg.LogEntries.(type) {
 		case *als.StreamAccessLogsMessage_HttpLogs:
@@ -19,4 +20,5 @@ func (svc *Handler) StreamAccessLogs(stream als.AccessLogService_StreamAccessLog
 			}
 		}
 	}
+	return err
 }

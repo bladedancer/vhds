@@ -2,12 +2,12 @@ envoy:
   fullnameOverride: front
   nameOverride: front
   image:
-    tag: v1.12.2
+    tag: v1.13.0
 
   xdsService:
     address: xds
     port: 9000
-    shardPort: 9005
+
   args:
     - -l
     - info
@@ -80,13 +80,3 @@ envoy:
           - socket_address:
               address: {{ .Values.xdsService.address }}
               port_value: {{ .Values.xdsService.port }}
-        - name: service_xds_shard
-          connect_timeout: 0.25s
-          type: LOGICAL_DNS
-          dns_lookup_family: V4_ONLY
-          dns_refresh_rate: "30s"
-          lb_policy: ROUND_ROBIN
-          hosts:
-          - socket_address:
-              address: {{ .Values.xdsService.address }}
-              port_value: {{ .Values.xdsService.shardPort }}

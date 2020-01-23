@@ -2,7 +2,7 @@ envoyss:
   fullnameOverride: back
   nameOverride: back
   image:
-    tag: latest
+    tag: v1.13.0
 
   podDisruptionBudget: |
     maxUnavailable: 3

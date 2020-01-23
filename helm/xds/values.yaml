@@ -1,7 +1,6 @@
 xds:
   address: xds
   port: 9000
-  shardPort: 9005
   domain: "bladedancer.dynu.net"
   dnsRefreshRate: 300000 # 300s
   respectDNSTTL: false # CoreDNS is too low

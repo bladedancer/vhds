@@ -16,7 +16,3 @@ spec:
     protocol: TCP
     port: {{ .Values.xds.port }}
     targetPort: xds
-  - name: grpc-xds-shard
-    protocol: TCP
-    port: {{ .Values.xds.shardPort }}
-    targetPort: shard

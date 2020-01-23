@@ -10,9 +10,7 @@ import (
 	listener "github.com/envoyproxy/go-control-plane/envoy/api/v2/listener"
 	access_config "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v2"
 	access_filter "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2"
-	lua "github.com/envoyproxy/go-control-plane/envoy/config/filter/http/lua/v2"
 	http_conn "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/conversion"
 	"github.com/golang/protobuf/ptypes"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 )
@@ -58,10 +56,6 @@ func MakeFrontendGateway() *Gateway {
 			config.UseProxyProto,
 			tlsContext,
 			&http_conn.HttpFilter{
-				Name:       "envoy.lua",
-				ConfigType: getLuaFilter(),
-			},
-			&http_conn.HttpFilter{
 				Name: "envoy.router",
 			},
 		),
@@ -74,6 +68,9 @@ func MakeBackendGateway() *Gateway {
 		Listener: makeListenerConfiguration(
 			false,
 			nil, // TLSContext
+			&http_conn.HttpFilter{
+				Name: "envoy.filters.http.on_demand",
+			},
 			&http_conn.HttpFilter{
 				Name: "envoy.router",
 			},
@@ -166,38 +163,6 @@ func makeListenerConfiguration(useProxyProto bool, tlsContext *auth.DownstreamTl
 			},
 		},
 		FilterChains: filterChains,
-	}
-}
-
-func getLuaFunc() string {
-	//TODO Add Service Callout
-	return string([]byte(`
-    function envoy_on_request(request_handle)
-       for key, value in pairs(request_handle:headers()) do
-          request_handle:logInfo(key .. ": " .. value)
-       end
-       local headers, body = request_handle:httpCall(
-         "service_xds_shard",
-         {
-          [":method"] = "GET",
-          [":path"] = "/shard",
-          [":authority"] = "service_xds_shard"
-        },
-        request_handle:headers():get(":authority") .. ":" .. request_handle:headers():get(":path") ,
-        5000)
-      request_handle:logInfo("Adding Shard via Lua " .. body)
-      request_handle:headers():add("x-shard", body)
-    end`))
-}
-
-func getLuaFilter() *http_conn.HttpFilter_Config {
-	log.Info("Building Lua Filter")
-	luaCfg := &lua.Lua{
-		InlineCode: getLuaFunc(),
-	}
-	luaConfig, _ := conversion.MessageToStruct(luaCfg)
-	return &http_conn.HttpFilter_Config{
-		Config: luaConfig,
 	}
 }
 

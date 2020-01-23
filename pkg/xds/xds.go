@@ -39,7 +39,8 @@ func Run() error {
 	api.RegisterListenerDiscoveryServiceServer(grpcServer, server)
 
 	// Virtual Host Discovery Service
-	api.RegisterVirtualHostDiscoveryServiceServer(grpcServer, &vhds.AxwayVirtualHostDiscoveryServiceServer{})
+	var vhdsSvc = vhds.NewAxwayVirtualHostDiscoveryServiceServer()
+	api.RegisterVirtualHostDiscoveryServiceServer(grpcServer, vhdsSvc)
 
 	// Configure the Access Log server.
 	als.RegisterAccessLogServiceServer(grpcServer, &accesslog.Handler{})

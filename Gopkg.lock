@@ -3,7 +3,7 @@
 
 [[projects]]
   name = "github.com/envoyproxy/go-control-plane"
-  packages = ["envoy/api/v2","envoy/api/v2/auth","envoy/api/v2/cluster","envoy/api/v2/core","envoy/api/v2/endpoint","envoy/api/v2/listener","envoy/api/v2/route","envoy/config/accesslog/v2","envoy/config/filter/accesslog/v2","envoy/config/filter/http/lua/v2","envoy/config/filter/network/http_connection_manager/v2","envoy/config/listener/v2","envoy/service/discovery/v2","envoy/type","envoy/type/matcher","pkg/cache","pkg/conversion","pkg/log","pkg/server","pkg/wellknown"]
+  packages = ["envoy/api/v2","envoy/api/v2/auth","envoy/api/v2/cluster","envoy/api/v2/core","envoy/api/v2/endpoint","envoy/api/v2/listener","envoy/api/v2/route","envoy/config/accesslog/v2","envoy/config/filter/accesslog/v2","envoy/config/filter/network/http_connection_manager/v2","envoy/config/listener/v2","envoy/data/accesslog/v2","envoy/service/accesslog/v2","envoy/service/discovery/v2","envoy/type","envoy/type/matcher","pkg/cache","pkg/conversion","pkg/log","pkg/server","pkg/wellknown"]
   revision = "34c8be46e7fdd171a21e25203bc29e9e9ee56886"
   version = "v0.9.1"
 
@@ -24,6 +24,12 @@
   packages = ["jsonpb","proto","protoc-gen-go/descriptor","ptypes","ptypes/any","ptypes/duration","ptypes/empty","ptypes/struct","ptypes/timestamp","ptypes/wrappers"]
   revision = "6c65a5562fc06764971b7c5d05c76c75e84bdbf7"
   version = "v1.3.2"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/guiguan/caster"
+  packages = ["."]
+  revision = "3736c4464f38ddd5f75b213cf456c979445d9806"
 
 [[projects]]
   name = "github.com/hashicorp/hcl"
@@ -154,6 +160,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "616a5ce73973c8442f23a4419eafd43d9156e77cbbc985f0c756221dcc6adddb"
+  inputs-digest = "67e3069f0c885fa1eb36b4181e26d94019e44f5fc6eefea4d68b992f6a29a247"
   solver-name = "gps-cdcl"
   solver-version = 1
